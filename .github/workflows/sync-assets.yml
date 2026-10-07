@@ -1,0 +1,41 @@
+name: Sync professor assets
+
+on:
+  push:
+    branches:
+      - asset-sync-helper
+    paths:
+      - '.github/workflows/sync-assets.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout student main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: work
+          fetch-depth: 0
+
+      - name: Checkout professor project
+        uses: actions/checkout@v4
+        with:
+          repository: rocketseat-education/portal-de-noticias
+          ref: 69df29b007d0c7269b6539b29b2621a1067331cd
+          path: official
+          persist-credentials: false
+
+      - name: Copy assets and commit
+        run: |
+          rm -rf work/assets
+          cp -R official/assets work/assets
+          cd work
+          git config user.name "fergoula-source"
+          git config user.email "228110272+fergoula-source@users.noreply.github.com"
+          git add assets
+          git commit -m "Adicionando os assets"
+          git push origin HEAD:main
